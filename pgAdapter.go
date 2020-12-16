@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
@@ -32,15 +33,16 @@ func main() {
 	r.HandleFunc("/", greeter).Methods("GET")
 	r.HandleFunc("/db_check", dbCheck(db)).Methods("GET")
 	r.HandleFunc("/users", getAllUsers(db)).Methods("GET")
-	// r.HandleFunc("/new_user", newUser(db)).Methods("POST")
+	r.HandleFunc("/new_user", newUser(db)).Methods("POST")
 
 	serve(r)
 	db.Close()
 }
 
-type client struct {
-	Id        int
-	Role      string
+type patient struct {
+	Pid       int
+	Fname     string
+	Sname     string
 	Gender    string
 	Diagnosis int
 }
@@ -59,7 +61,8 @@ func greeter(w http.ResponseWriter, r *http.Request) {
 func dbCheck(db *sql.DB) func(w http.ResponseWriter, r *http.Request) {
 	err := db.Ping()
 	if err != nil {
-		panic(err)
+		fmt.Print("db ping failed")
+		fmt.Print(err)
 	}
 	return func(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintf(w, "Successfully connected")
@@ -68,25 +71,26 @@ func dbCheck(db *sql.DB) func(w http.ResponseWriter, r *http.Request) {
 
 func getAllUsers(db *sql.DB) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
-		sqlStatement := "SELECT * FROM public.users;"
+		sqlStatement := "SELECT * FROM patients;"
 		result, err := db.Query(sqlStatement)
 		if err != nil {
 			panic(err)
 		}
 		defer result.Close()
 
-		users := make([]client, 0)
+		users := make([]patient, 0)
 		for result.Next() {
-			var id int
-			var role string
+			var pid int
 			var gender string
 			var diagnosis int
-			err = result.Scan(&id, &role, &gender, &diagnosis)
+			var fname string
+			var sname string
+			err = result.Scan(&pid, &fname, &sname, &gender, &diagnosis)
 			if err != nil {
 				panic(err)
 			}
 
-			users = append(users, client{id, role, gender, diagnosis})
+			users = append(users, patient{pid, "anon", "anon", gender, diagnosis})
 		}
 		output, err := json.Marshal(users)
 		if err != nil {
@@ -98,22 +102,19 @@ func getAllUsers(db *sql.DB) func(w http.ResponseWriter, r *http.Request) {
 
 func newUser(db *sql.DB) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
-		// Parse JSON from body of request
 
-		// deets from JSON
-		role := ""
-		gender := ""
-		diagnosis := ""
-
-		sqlStatement := `INSERT INTO users(id,role,gender,diagnosis)
-		VALUES(DEFAULT,$1,$2,$3);`
-
-		_, err := db.Exec(sqlStatement, role, gender, diagnosis)
-		if err != nil {
-			// TODO - dont panic
-			panic(err)
+		body, _ := ioutil.ReadAll(r.Body)
+		newPatient := patient{}
+		if json.Unmarshal(body, &newPatient) != nil {
+			http.Error(w, "Couldnt read post body", http.StatusBadRequest)
 		}
 
-		// Appropriate http response
+		sqlStatement := `INSERT INTO patients(pid,fname,sname,gender,diagnosis)
+		VALUES($1,'anon','anon',$2,$3);`
+		_, sqlerr := db.Exec(sqlStatement, newPatient.Pid, newPatient.Gender, newPatient.Diagnosis)
+		if sqlerr != nil {
+			// TODO - dont panic
+			panic(sqlerr)
+		}
 	}
 }
