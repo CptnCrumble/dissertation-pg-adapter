@@ -4,7 +4,6 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
@@ -33,18 +32,11 @@ func main() {
 	r.HandleFunc("/", greeter).Methods("GET")
 	r.HandleFunc("/db_check", dbCheck(db)).Methods("GET")
 	r.HandleFunc("/users", getAllUsers(db)).Methods("GET")
-	r.HandleFunc("/new_user", newUser(db)).Methods("POST")
+	r.HandleFunc("/new_patient", newPatient(db)).Methods("POST")
+	r.HandleFunc("/new_nms", newNms(db)).Methods("POST")
 
 	serve(r)
 	db.Close()
-}
-
-type patient struct {
-	Pid       int
-	Fname     string
-	Sname     string
-	Gender    string
-	Diagnosis int
 }
 
 func serve(router *mux.Router) {
@@ -97,24 +89,5 @@ func getAllUsers(db *sql.DB) func(w http.ResponseWriter, r *http.Request) {
 			fmt.Fprintf(w, "json parsing error")
 		}
 		fmt.Fprintf(w, string(output))
-	}
-}
-
-func newUser(db *sql.DB) func(w http.ResponseWriter, r *http.Request) {
-	return func(w http.ResponseWriter, r *http.Request) {
-
-		body, _ := ioutil.ReadAll(r.Body)
-		newPatient := patient{}
-		if json.Unmarshal(body, &newPatient) != nil {
-			http.Error(w, "Couldnt read post body", http.StatusBadRequest)
-		}
-
-		sqlStatement := `INSERT INTO patients(pid,fname,sname,gender,diagnosis)
-		VALUES($1,'anon','anon',$2,$3);`
-		_, sqlerr := db.Exec(sqlStatement, newPatient.Pid, newPatient.Gender, newPatient.Diagnosis)
-		if sqlerr != nil {
-			// TODO - dont panic
-			panic(sqlerr)
-		}
 	}
 }
