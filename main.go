@@ -63,26 +63,24 @@ func dbCheck(db *sql.DB) func(w http.ResponseWriter, r *http.Request) {
 
 func getAllUsers(db *sql.DB) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
-		sqlStatement := "SELECT * FROM patients;"
+		enableCors(&w)
+
+		sqlStatement := "SELECT pid FROM patients;"
 		result, err := db.Query(sqlStatement)
 		if err != nil {
 			panic(err)
 		}
 		defer result.Close()
 
-		users := make([]patient, 0)
+		users := make([]int, 0)
 		for result.Next() {
 			var pid int
-			var gender string
-			var diagnosis int
-			var fname string
-			var sname string
-			err = result.Scan(&pid, &fname, &sname, &gender, &diagnosis)
+			err = result.Scan(&pid)
 			if err != nil {
 				panic(err)
 			}
 
-			users = append(users, patient{pid, "anon", "anon", gender, diagnosis})
+			users = append(users, pid)
 		}
 		output, err := json.Marshal(users)
 		if err != nil {
@@ -90,4 +88,9 @@ func getAllUsers(db *sql.DB) func(w http.ResponseWriter, r *http.Request) {
 		}
 		fmt.Fprintf(w, string(output))
 	}
+}
+
+func enableCors(w *http.ResponseWriter) {
+	cuduiIP := fmt.Sprintf("http://%s:%d", os.Getenv("PG_HOST"), 9090)
+	(*w).Header().Set("Access-Control-Allow-Origin", cuduiIP)
 }
