@@ -3,6 +3,7 @@ package main
 import (
 	"database/sql"
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 )
@@ -28,8 +29,7 @@ func newPatient(db *sql.DB) func(w http.ResponseWriter, r *http.Request) {
 		VALUES($1,'anon','anon',$2,$3);`
 		_, sqlerr := db.Exec(sqlStatement, newPatient.Pid, newPatient.Gender, newPatient.Diagnosis)
 		if sqlerr != nil {
-			// TODO - dont panic
-			panic(sqlerr)
+			redisLogger(fmt.Sprintf("newPatient() failed to write to database -- %s", sqlerr.Error()))
 		}
 	}
 }

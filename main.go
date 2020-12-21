@@ -7,7 +7,9 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"time"
 
+	"github.com/gomodule/redigo/redis"
 	"github.com/gorilla/mux"
 	_ "github.com/lib/pq"
 )
@@ -28,6 +30,8 @@ func main() {
 		panic(err)
 	}
 
+	redisLogger("Database connection established")
+
 	r := mux.NewRouter()
 	r.HandleFunc("/", greeter).Methods("GET")
 	r.HandleFunc("/db_check", dbCheck(db)).Methods("GET")
@@ -46,6 +50,28 @@ func serve(router *mux.Router) {
 	}
 }
 
+func redisLogger(message string) {
+	redisLocation := fmt.Sprintf("%s:6379", os.Getenv("PG_HOST"))
+	conn, err := redis.Dial("tcp", redisLocation)
+
+	if err != nil {
+		log.Print(err)
+		return
+	}
+	defer conn.Close()
+
+	t := time.Now()
+	log2go := fmt.Sprintf("PG-ADAPTER -- %s -- %s", t.Format("2006-01-02 15:04:05"), message)
+	_, err = conn.Do("LPUSH", "logs", log2go)
+
+	if err != nil {
+		log.Print("Couldn't log to redis")
+		log.Print(log2go)
+	} else {
+		log.Print("logged to redis")
+	}
+}
+
 func greeter(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "yeah yeah I'm working")
 }
@@ -53,8 +79,7 @@ func greeter(w http.ResponseWriter, r *http.Request) {
 func dbCheck(db *sql.DB) func(w http.ResponseWriter, r *http.Request) {
 	err := db.Ping()
 	if err != nil {
-		fmt.Print("db ping failed")
-		fmt.Print(err)
+		redisLogger(fmt.Sprintf("db ping failed -- %s", err.Error()))
 	}
 	return func(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintf(w, "Successfully connected")
@@ -68,7 +93,7 @@ func getAllUsers(db *sql.DB) func(w http.ResponseWriter, r *http.Request) {
 		sqlStatement := "SELECT pid FROM patients;"
 		result, err := db.Query(sqlStatement)
 		if err != nil {
-			panic(err)
+			redisLogger(fmt.Sprintf("getAllUsers() failed -- %s", err.Error()))
 		}
 		defer result.Close()
 
@@ -85,6 +110,7 @@ func getAllUsers(db *sql.DB) func(w http.ResponseWriter, r *http.Request) {
 		output, err := json.Marshal(users)
 		if err != nil {
 			fmt.Fprintf(w, "json parsing error")
+			redisLogger(fmt.Sprintf("couldn't parse pids to JSON -- %s", err.Error()))
 		}
 		fmt.Fprintf(w, string(output))
 	}
