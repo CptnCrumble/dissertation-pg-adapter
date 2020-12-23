@@ -39,6 +39,7 @@ func main() {
 	r.HandleFunc("/new_patient", newPatient(db)).Methods("POST")
 	r.HandleFunc("/new_nms", newNms(db)).Methods("POST")
 	r.HandleFunc("/new_updrs", newUpdrs(db)).Methods("POST")
+	r.HandleFunc("/new_pdq39", newPdq39(db)).Methods("POST")
 
 	serve(r)
 	db.Close()
