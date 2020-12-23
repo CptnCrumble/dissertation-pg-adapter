@@ -36,10 +36,12 @@ func main() {
 	r.HandleFunc("/", greeter).Methods("GET")
 	r.HandleFunc("/db_check", dbCheck(db)).Methods("GET")
 	r.HandleFunc("/users", getAllUsers(db)).Methods("GET")
+	r.HandleFunc("/carers", getAllCarers(db)).Methods("GET")
 	r.HandleFunc("/new_patient", newPatient(db)).Methods("POST")
 	r.HandleFunc("/new_nms", newNms(db)).Methods("POST")
 	r.HandleFunc("/new_updrs", newUpdrs(db)).Methods("POST")
 	r.HandleFunc("/new_pdq39", newPdq39(db)).Methods("POST")
+	r.HandleFunc("/new_carer", newCarer(db)).Methods("POST")
 
 	serve(r)
 	db.Close()
@@ -110,6 +112,36 @@ func getAllUsers(db *sql.DB) func(w http.ResponseWriter, r *http.Request) {
 			users = append(users, pid)
 		}
 		output, err := json.Marshal(users)
+		if err != nil {
+			fmt.Fprintf(w, "json parsing error")
+			redisLogger(fmt.Sprintf("couldn't parse pids to JSON -- %s", err.Error()))
+		}
+		fmt.Fprintf(w, string(output))
+	}
+}
+
+func getAllCarers(db *sql.DB) func(w http.ResponseWriter, r *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
+		enableCors(&w)
+
+		sqlStatement := "SELECT cid FROM carers;"
+		result, err := db.Query(sqlStatement)
+		if err != nil {
+			redisLogger(fmt.Sprintf("getAllCarers() failed -- %s", err.Error()))
+		}
+		defer result.Close()
+
+		carers := make([]int, 0)
+		for result.Next() {
+			var cid int
+			err = result.Scan(&cid)
+			if err != nil {
+				panic(err)
+			}
+
+			carers = append(carers, cid)
+		}
+		output, err := json.Marshal(carers)
 		if err != nil {
 			fmt.Fprintf(w, "json parsing error")
 			redisLogger(fmt.Sprintf("couldn't parse pids to JSON -- %s", err.Error()))
