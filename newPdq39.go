@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+
+	"github.com/gorilla/mux"
 )
 
 type pdq39 struct {
@@ -68,5 +70,39 @@ func newPdq39(db *sql.DB) func(w http.ResponseWriter, r *http.Request) {
 		if sqlError != nil {
 			redisLogger(fmt.Sprintf("new pdq39 insertion failed -- %s", sqlError.Error()))
 		}
+	}
+}
+
+func getPdq39Data(db *sql.DB) func(w http.ResponseWriter, r *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
+		enableCors(&w)
+
+		vars := mux.Vars(r)
+		pid := vars["pid"]
+
+		sqlStatement := fmt.Sprintf("SELECT * FROM pdq39 WHERE pid=%s;", pid)
+		result, err := db.Query(sqlStatement)
+		if err != nil {
+			redisLogger(fmt.Sprintf("getPdq39Data() tried %s but failed -- %s", sqlStatement, err.Error()))
+		}
+		defer result.Close()
+
+		data := make([]pdq39, 0)
+		for result.Next() {
+			var p pdq39
+			var pk int
+			err = result.Scan(&pk, &p.Pid, &p.AssessmentNumber, &p.AssessmentDate, &p.Pdq1, &p.Pdq2, &p.Pdq3, &p.Pdq4, &p.Pdq5, &p.Pdq6, &p.Pdq7, &p.Pdq8, &p.Pdq9, &p.Pdq10, &p.Pdq11, &p.Pdq12, &p.Pdq13, &p.Pdq14, &p.Pdq15, &p.Pdq16, &p.Pdq17, &p.Pdq18, &p.Pdq19, &p.Pdq20, &p.Pdq21, &p.Pdq22, &p.Pdq23, &p.Pdq24, &p.Pdq25, &p.Pdq26, &p.Pdq27, &p.Pdq28, &p.Pdq29, &p.Pdq30, &p.Pdq31, &p.Pdq32, &p.Pdq33, &p.Pdq34, &p.Pdq35, &p.Pdq36, &p.Pdq37, &p.Pdq38, &p.Pdq39)
+			if err != nil {
+				redisLogger(fmt.Sprintf("getPdq39Data() - Scanning results failed -- %s", err.Error()))
+			}
+
+			data = append(data, p)
+		}
+		output, err := json.Marshal(data)
+		if err != nil {
+			fmt.Fprintf(w, "json parsing error")
+			redisLogger(fmt.Sprintf("couldn't parse pids to JSON -- %s", err.Error()))
+		}
+		fmt.Fprintf(w, string(output))
 	}
 }
