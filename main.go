@@ -37,6 +37,7 @@ func main() {
 	r.HandleFunc("/db_check", dbCheck(db)).Methods("GET")
 	r.HandleFunc("/users", getAllUsers(db)).Methods("GET")
 	r.HandleFunc("/carers", getAllCarers(db)).Methods("GET")
+	r.HandleFunc("/login", authenticate(db)).Methods("POST")
 	r.HandleFunc("/new_patient", newPatient(db)).Methods("POST")
 	r.HandleFunc("/new_carer", newCarer(db)).Methods("POST")
 	r.HandleFunc("/new_nms", newNms(db)).Methods("POST")
@@ -108,7 +109,7 @@ func getAllUsers(db *sql.DB) func(w http.ResponseWriter, r *http.Request) {
 			var pid int
 			err = result.Scan(&pid)
 			if err != nil {
-				panic(err)
+				redisLogger(fmt.Sprintf("getAllUsers() failed -- %s", err.Error()))
 			}
 
 			users = append(users, pid)
