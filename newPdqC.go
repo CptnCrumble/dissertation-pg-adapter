@@ -12,35 +12,35 @@ type pdqCForm struct {
 	Cid              int
 	AssessmentNumber string
 	AssessmentDate   string
-	PdqC1            int
-	PdqC2            int
-	PdqC3            int
-	PdqC4            int
-	PdqC5            int
-	PdqC6            int
-	PdqC7            int
-	PdqC8            int
-	PdqC9            int
-	PdqC10           int
-	PdqC11           int
-	PdqC12           int
-	PdqC13           int
-	PdqC14           int
-	PdqC15           int
-	PdqC16           int
-	PdqC17           int
-	PdqC18           int
-	PdqC19           int
-	PdqC20           int
-	PdqC21           int
-	PdqC22           int
-	PdqC23           int
-	PdqC24           int
-	PdqC25           int
-	PdqC26           int
-	PdqC27           int
-	PdqC28           int
-	PdqC29           int
+	PdqC1            string
+	PdqC2            string
+	PdqC3            string
+	PdqC4            string
+	PdqC5            string
+	PdqC6            string
+	PdqC7            string
+	PdqC8            string
+	PdqC9            string
+	PdqC10           string
+	PdqC11           string
+	PdqC12           string
+	PdqC13           string
+	PdqC14           string
+	PdqC15           string
+	PdqC16           string
+	PdqC17           string
+	PdqC18           string
+	PdqC19           string
+	PdqC20           string
+	PdqC21           string
+	PdqC22           string
+	PdqC23           string
+	PdqC24           string
+	PdqC25           string
+	PdqC26           string
+	PdqC27           string
+	PdqC28           string
+	PdqC29           string
 }
 
 func newPdqC(db *sql.DB) func(w http.ResponseWriter, r *http.Request) {

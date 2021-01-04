@@ -12,15 +12,15 @@ type updrsForm struct {
 	Pid              int
 	AssessmentNumber string
 	AssessmentDate   string
-	Speech           int
-	Saliva           int
-	Chewing          int
-	Eating           int
-	Dressing         int
-	Hygiene          int
-	Handwriting      int
-	Hobbies          int
-	Turning          int
+	Speech           string
+	Saliva           string
+	Chewing          string
+	Eating           string
+	Dressing         string
+	Hygiene          string
+	Handwriting      string
+	Hobbies          string
+	Turning          string
 }
 
 func newUpdrs(db *sql.DB) func(w http.ResponseWriter, r *http.Request) {

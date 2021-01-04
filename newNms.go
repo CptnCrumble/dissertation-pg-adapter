@@ -12,37 +12,37 @@ type nmsForm struct {
 	Pid              int
 	AssessmentNumber string
 	AssessmentDate   string
-	Nms1             bool
-	Nms2             bool
-	Nms3             bool
-	Nms4             bool
-	Nms5             bool
-	Nms6             bool
-	Nms7             bool
-	Nms8             bool
-	Nms9             bool
-	Nms10            bool
-	Nms11            bool
-	Nms12            bool
-	Nms13            bool
-	Nms14            bool
-	Nms15            bool
-	Nms16            bool
-	Nms17            bool
-	Nms18            bool
-	Nms19            bool
-	Nms20            bool
-	Nms21            bool
-	Nms22            bool
-	Nms23            bool
-	Nms24            bool
-	Nms25            bool
-	Nms26            bool
-	Nms27            bool
-	Nms28            bool
-	Nms29            bool
-	Nms30            bool
-	Nms31            bool
+	Nms1             string
+	Nms2             string
+	Nms3             string
+	Nms4             string
+	Nms5             string
+	Nms6             string
+	Nms7             string
+	Nms8             string
+	Nms9             string
+	Nms10            string
+	Nms11            string
+	Nms12            string
+	Nms13            string
+	Nms14            string
+	Nms15            string
+	Nms16            string
+	Nms17            string
+	Nms18            string
+	Nms19            string
+	Nms20            string
+	Nms21            string
+	Nms22            string
+	Nms23            string
+	Nms24            string
+	Nms25            string
+	Nms26            string
+	Nms27            string
+	Nms28            string
+	Nms29            string
+	Nms30            string
+	Nms31            string
 }
 
 func newNms(db *sql.DB) func(w http.ResponseWriter, r *http.Request) {
