@@ -59,6 +59,7 @@ func newNms(db *sql.DB) func(w http.ResponseWriter, r *http.Request) {
 		_, sqlerr := db.Exec(sqlStatement, nms.Pid, nms.AssessmentNumber, nms.AssessmentDate, nms.Nms1, nms.Nms2, nms.Nms3, nms.Nms4, nms.Nms5, nms.Nms6, nms.Nms7, nms.Nms8, nms.Nms9, nms.Nms10, nms.Nms11, nms.Nms12, nms.Nms13, nms.Nms14, nms.Nms15, nms.Nms16, nms.Nms17, nms.Nms18, nms.Nms19, nms.Nms20, nms.Nms21, nms.Nms22, nms.Nms23, nms.Nms24, nms.Nms25, nms.Nms26, nms.Nms27, nms.Nms28, nms.Nms29, nms.Nms30, nms.Nms31)
 		if sqlerr != nil {
 			redisLogger(fmt.Sprintf("newNms() failed to write to database -- %s", sqlerr.Error()))
+			http.Error(w, sqlerr.Error(), http.StatusBadRequest)
 		}
 	}
 }

@@ -71,6 +71,7 @@ func newPdq39(db *sql.DB) func(w http.ResponseWriter, r *http.Request) {
 		_, sqlError := db.Exec(sqlStatement, pdq.Pid, pdq.AssessmentNumber, pdq.AssessmentDate, pdq.Pdq1, pdq.Pdq2, pdq.Pdq3, pdq.Pdq4, pdq.Pdq5, pdq.Pdq6, pdq.Pdq7, pdq.Pdq8, pdq.Pdq9, pdq.Pdq10, pdq.Pdq11, pdq.Pdq12, pdq.Pdq13, pdq.Pdq14, pdq.Pdq15, pdq.Pdq16, pdq.Pdq17, pdq.Pdq18, pdq.Pdq19, pdq.Pdq20, pdq.Pdq21, pdq.Pdq22, pdq.Pdq23, pdq.Pdq24, pdq.Pdq25, pdq.Pdq26, pdq.Pdq27, pdq.Pdq28, pdq.Pdq29, pdq.Pdq30, pdq.Pdq31, pdq.Pdq32, pdq.Pdq33, pdq.Pdq34, pdq.Pdq35, pdq.Pdq36, pdq.Pdq37, pdq.Pdq38, pdq.Pdq39)
 		if sqlError != nil {
 			redisLogger(fmt.Sprintf("new pdq39 insertion failed -- %s", sqlError.Error()))
+			http.Error(w, sqlError.Error(), http.StatusBadRequest)
 		}
 	}
 }

@@ -57,6 +57,7 @@ func newPdqC(db *sql.DB) func(w http.ResponseWriter, r *http.Request) {
 		_, err := db.Exec(sqlStatement, pdqc.Cid, pdqc.AssessmentNumber, pdqc.AssessmentDate, pdqc.PdqC1, pdqc.PdqC2, pdqc.PdqC3, pdqc.PdqC4, pdqc.PdqC5, pdqc.PdqC6, pdqc.PdqC7, pdqc.PdqC8, pdqc.PdqC9, pdqc.PdqC10, pdqc.PdqC11, pdqc.PdqC12, pdqc.PdqC13, pdqc.PdqC14, pdqc.PdqC15, pdqc.PdqC16, pdqc.PdqC17, pdqc.PdqC18, pdqc.PdqC19, pdqc.PdqC20, pdqc.PdqC21, pdqc.PdqC22, pdqc.PdqC23, pdqc.PdqC24, pdqc.PdqC25, pdqc.PdqC26, pdqc.PdqC27, pdqc.PdqC28, pdqc.PdqC29)
 		if err != nil {
 			redisLogger(fmt.Sprintf("newPdqC() failed to write to database -- %s", err.Error()))
+			http.Error(w, err.Error(), http.StatusBadRequest)
 		}
 
 	}

@@ -37,6 +37,7 @@ func newUpdrs(db *sql.DB) func(w http.ResponseWriter, r *http.Request) {
 		_, err := db.Exec(sqlStatement, updrs.Pid, updrs.AssessmentNumber, updrs.AssessmentDate, updrs.Speech, updrs.Saliva, updrs.Chewing, updrs.Eating, updrs.Dressing, updrs.Hygiene, updrs.Handwriting, updrs.Hobbies, updrs.Turning)
 		if err != nil {
 			redisLogger(fmt.Sprintf("newUpdrs() failed to write to database -- %s", err.Error()))
+			http.Error(w, err.Error(), http.StatusBadRequest)
 		}
 	}
 }

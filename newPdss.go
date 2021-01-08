@@ -45,6 +45,7 @@ func newPdss(db *sql.DB) func(w http.ResponseWriter, r *http.Request) {
 		_, sqlError := db.Exec(sqlStatement, pdss.Pid, pdss.AssessmentNumber, pdss.AssessmentDate, pdss.Pdss1, pdss.Pdss2, pdss.Pdss3, pdss.Pdss4, pdss.Pdss5, pdss.Pdss6, pdss.Pdss7, pdss.Pdss8, pdss.Pdss9, pdss.Pdss10, pdss.Pdss11, pdss.Pdss12, pdss.Pdss13, pdss.Pdss14, pdss.Pdss15)
 		if sqlError != nil {
 			redisLogger(fmt.Sprintf("new pdss insertion failed -- %s", sqlError.Error()))
+			http.Error(w, sqlError.Error(), http.StatusBadRequest)
 		}
 	}
 }

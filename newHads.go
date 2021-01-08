@@ -44,6 +44,7 @@ func newHads(db *sql.DB) func(w http.ResponseWriter, r *http.Request) {
 		_, sqlError := db.Exec(sqlStatement, hads.Pid, hads.AssessmentNumber, hads.AssessmentDate, hads.Tense, hads.Enjoy, hads.Fright, hads.Laugh, hads.Worry, hads.Cheer, hads.Ease, hads.Slow, hads.Butterfly, hads.Interest, hads.Restless, hads.Forward, hads.Panic, hads.Book)
 		if sqlError != nil {
 			redisLogger(fmt.Sprintf("new hads insertion failed -- %s", sqlError.Error()))
+			http.Error(w, sqlError.Error(), http.StatusBadRequest)
 		}
 	}
 }

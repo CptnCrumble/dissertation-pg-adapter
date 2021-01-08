@@ -30,6 +30,7 @@ func newPatient(db *sql.DB) func(w http.ResponseWriter, r *http.Request) {
 		_, sqlerr := db.Exec(sqlStatement, newPatient.Pid, newPatient.Gender, newPatient.Diagnosis)
 		if sqlerr != nil {
 			redisLogger(fmt.Sprintf("newPatient() failed to write to database -- %s", sqlerr.Error()))
+			http.Error(w, sqlerr.Error(), http.StatusBadRequest)
 		}
 	}
 }

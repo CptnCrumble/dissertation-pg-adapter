@@ -39,6 +39,7 @@ func newCarer(db *sql.DB) func(w http.ResponseWriter, r *http.Request) {
 			_, sqlErrorR := db.Exec(sqlStatementR, newC.Pid, newC.Cid, newC.Relationship)
 			if sqlErrorR != nil {
 				redisLogger(fmt.Sprintf("newCarer() failed to write to relationships table -- %s", sqlErrorR.Error()))
+				http.Error(w, sqlErrorR.Error(), http.StatusBadRequest)
 			}
 		} else {
 			redisLogger(fmt.Sprintf("newCarer() received a cid of 0, likely bad http post -- %s", string(body)))

@@ -47,6 +47,7 @@ func main() {
 	r.HandleFunc("/new_pdq8", newPdq8(db)).Methods("POST")
 	r.HandleFunc("/new_hads", newHads(db)).Methods("POST")
 	r.HandleFunc("/new_pdss", newPdss(db)).Methods("POST")
+	r.HandleFunc("/new_pkg", newPkg(db)).Methods("POST")
 	r.HandleFunc("/pdq39data/{pid}", getPdq39Data(db)).Methods("GET")
 
 	serve(r)

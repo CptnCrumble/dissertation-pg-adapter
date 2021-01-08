@@ -38,6 +38,7 @@ func newPdq8(db *sql.DB) func(w http.ResponseWriter, r *http.Request) {
 		_, sqlError := db.Exec(sqlStatement, pdq.Pid, pdq.AssessmentNumber, pdq.AssessmentDate, pdq.Pdq1, pdq.Pdq2, pdq.Pdq3, pdq.Pdq4, pdq.Pdq5, pdq.Pdq6, pdq.Pdq7, pdq.Pdq8)
 		if sqlError != nil {
 			redisLogger(fmt.Sprintf("new pdq8 insertion failed -- %s", sqlError.Error()))
+			http.Error(w, sqlError.Error(), http.StatusBadRequest)
 		}
 	}
 }
