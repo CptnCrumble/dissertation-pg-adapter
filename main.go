@@ -16,8 +16,8 @@ import (
 
 func main() {
 
-	host := os.Getenv("PG_HOST")
-	port := os.Getenv("PG_PORT")
+	host := os.Getenv("POSTGRES_SERVICE_SERVICE_HOST")
+	port := os.Getenv("POSTGRES_SERVICE_SERVICE_PORT")
 	user := os.Getenv("PG_USER")
 	password := os.Getenv("PG_PWORD")
 	dbname := os.Getenv("PG_DBNAME")
@@ -62,7 +62,7 @@ func serve(router *mux.Router) {
 }
 
 func redisLogger(message string) {
-	redisLocation := fmt.Sprintf("%s:6379", os.Getenv("PG_HOST"))
+	redisLocation := fmt.Sprintf("%s:6379", os.Getenv("REDIS_HOST"))
 	conn, err := redis.Dial("tcp", redisLocation)
 
 	if err != nil {
